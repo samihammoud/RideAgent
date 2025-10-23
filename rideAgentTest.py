@@ -1,5 +1,8 @@
 import requests
 
+API_TOKEN = "mysecrettoken123"
+headers = {"Authorization": f"Bearer {API_TOKEN}"}
+
 url = "https://jsonplaceholder.typicode.com/posts/1"
 
 response = requests.get(url)
