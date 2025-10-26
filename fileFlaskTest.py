@@ -1,33 +1,41 @@
-from flask import Flask, jsonify
+import tkinter as tk
+from tkinter import messagebox
 from dotenv import load_dotenv
-import os, threading, time, requests
+import os, requests, threading, time
 
+# Load environment variables
 load_dotenv()
-url = os.getenv("URL") 
-
-app = Flask(__name__)
+url = os.getenv("URL") or "https://jsonplaceholder.typicode.com/posts/1"
 token = os.getenv("AUTH_TOKEN")
 
-@app.route('/')
-def home():
-    return jsonify({"message": "Server is running"})
-
-# Function to send GET request after startup
+# Function to send GET request
 def send_get_request():
-    time.sleep(1)  # wait a moment for Flask to start
-    print(f"Sending GET request to: {url}")
-    try:
-        headers = {
-            "Authorization": f"Bearer {token}",
-            "Accept": "application/json"
-        }
-        response = requests.get(url, headers=headers)
-        print("Response status:", response.status_code)
-        print("Response body:", response.text[:200])  # print first 200 chars
-    except Exception as e:
-        print("Request failed:", e)
-    
-if __name__ == '__main__':
-    # Run GET request in a separate thread so Flask can start normally
-    threading.Thread(target=send_get_request).start()
-    app.run(host='0.0.0.0', port=3000, debug=True)
+    def run_request():
+        time.sleep(0.2)
+        print(f"Sending GET request to: {url}")
+        try:
+            headers = {
+                "Authorization": f"Bearer {token}",
+                "Accept": "application/json"
+            }
+            response = requests.get(url, headers=headers)
+            print("Response status:", response.status_code)
+            print("Response body:", response.text[:200])
+            messagebox.showinfo("Success", f"Status: {response.status_code}")
+        except Exception as e:
+            print("Request failed:", e)
+            messagebox.showerror("Error", str(e))
+    threading.Thread(target=run_request).start()
+
+# ---- Tkinter GUI ----
+window = tk.Tk()
+window.title("GET Request App")
+window.geometry("300x150")
+
+label = tk.Label(window, text="Click to send GET request", font=("Arial", 12))
+label.pack(pady=20)
+
+button = tk.Button(window, text="Send Request", command=send_get_request, bg="blue", fg="white")
+button.pack(pady=10)
+
+window.mainloop()
