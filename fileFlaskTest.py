@@ -8,19 +8,12 @@ get_url = os.getenv("GET_URL")
 post_url = os.getenv("POST_URL") # or "https://jsonplaceholder.typicode.com/posts/1"
 token = os.getenv("AUTH_TOKEN")
 
-def send_post_request(trip_id, due_date):
+def send_post_request(payload):
     try:
         headers = {
             "Authorization": f"Bearer {token}",
             "Accept": "application/json",
             "Content-Type": "application/json"
-        }
-
-        payload = {
-            "boltTripIds": trip_id,
-            "driverId": "47065",
-            "eventType": "confirm",
-            "time": due_date
         }
 
         response = requests.post(post_url, headers=headers, json=payload)

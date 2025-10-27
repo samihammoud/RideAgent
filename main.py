@@ -55,12 +55,24 @@ def handle_get_request():
         # print("RESULTS:", results)
     return results
 
-##GETS BOLT TRIP ID, TIME; BUILD FINAL JSON STRUCTURE IN fileFlaskTest
-def handle_post_request():
-    results = handle_get_request()
-    # print(results[0], "FIRST ONE")
-    trip_id, due_date = results[0]
-    response = fileFlaskTest.send_post_request(trip_id, due_date)
+def poll_forever():
+    while True:
+        try:
+            results = handle_get_request()
+            for trip_id, due_date in results:
+                payload = {
+                    "boltTripIds": trip_id,
+                    "driverId": "47065",
+                    "eventType": "confirm",
+                    "time": due_date
+                }
+                fileFlaskTest.send_post_request(payload)
+
+            # Wait before next poll
+            time.sleep(3)
+
+        except Exception as e:
+            print("rror during polling:", e)
 
 
 
