@@ -7,7 +7,6 @@ from datetime import date
 import json
 
 
-
 def start_gui():
     #window 
     window = tk.Tk()
@@ -19,15 +18,16 @@ def start_gui():
 
 
     #buttons
-    button = tk.Button(window, text="Send Request", command=handle_request, bg="blue", fg="white")
+    # button = tk.Button(window, text="Send Get Request", command=handle_get_request, bg="blue", fg="black")
+    # button.pack(pady=10)
+
+
+    button = tk.Button(window, text="Send Post Request", command=handle_post_request, bg="blue", fg="black")
     button.pack(pady=10)
 
     window.mainloop()
 
-
-
-
-def handle_request():
+def handle_get_request():
     response = fileFlaskTest.send_get_request()
     try:
         data = json.loads(response)
@@ -49,11 +49,18 @@ def handle_request():
         # print("DUE DATE:", due_date)
         if (
             ("RIVERSIDE" in [pu_city, do_city] or "CORONA" or "RANCHO MIRAGE" in [pu_city]) and
-            "28 Oct" in due_date and pay_amount>=20
+            "29 Oct" in due_date and pay_amount>=20
         ):
             results.append((trip["boltTripId"], due_date))
-        print("RESULTS:", results)
-        return results
+        # print("RESULTS:", results)
+    return results
+
+##GETS BOLT TRIP ID, TIME; BUILD FINAL JSON STRUCTURE IN fileFlaskTest
+def handle_post_request():
+    results = handle_get_request()
+    # print(results[0], "FIRST ONE")
+    trip_id, due_date = results[0]
+    response = fileFlaskTest.send_post_request(trip_id, due_date)
 
 
 
