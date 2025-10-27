@@ -18,11 +18,10 @@ def start_gui():
 
 
     #buttons
-    # button = tk.Button(window, text="Send Get Request", command=handle_get_request, bg="blue", fg="black")
-    # button.pack(pady=10)
+    button = tk.Button(window, text="Send Get Request", command=handle_get_request, bg="blue", fg="black")
+    button.pack(pady=10)
 
 
-    button = tk.Button(window, text="Send Post Request", command=handle_post_request, bg="blue", fg="black")
     button.pack(pady=10)
 
     window.mainloop()
@@ -72,7 +71,7 @@ def poll_forever():
             time.sleep(3)
 
         except Exception as e:
-            print("rror during polling:", e)
+            print("error during polling:", e)
 
 
 
