@@ -48,10 +48,11 @@ def handle_request():
         due_date = trip.get("dueDateTime", "")
         # print("DUE DATE:", due_date)
         if (
-            ("RIVERSIDE" in [pu_city, do_city] or "CORONA" in [pu_city]) and
+            ("RIVERSIDE" in [pu_city, do_city] or "CORONA" or "RANCHO MIRAGE" in [pu_city]) and
             "28 Oct" in due_date and pay_amount>=20
         ):
             results.append((trip["boltTripId"], due_date))
+        print("RESULTS:", results)
         return results
 
 
