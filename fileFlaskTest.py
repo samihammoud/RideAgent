@@ -1,7 +1,9 @@
-from flask import Flask, jsonify
+import tkinter as tk
+from tkinter import messagebox
 from dotenv import load_dotenv
-import os, threading, time, requests
+import os, requests, threading, time
 
+# Load environment variables
 load_dotenv()
 get_url = os.getenv("GET_URL") 
 post_url = os.getenv("POST_URL")
@@ -9,11 +11,7 @@ post_url = os.getenv("POST_URL")
 app = Flask(__name__)
 token = os.getenv("AUTH_TOKEN")
 
-@app.route('/')
-def home():
-    return jsonify({"message": "Server is running"})
-
-# Function to send GET request after startup
+# Function to send GET request
 def send_get_request():
     time.sleep(1)  # wait a moment for Flask to start
     print(f"Sending GET request to: {get_url}")
