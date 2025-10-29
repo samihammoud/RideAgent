@@ -6,15 +6,20 @@ import fileFlaskTest
 from datetime import datetime
 import json
 
-cities = []
+puCities = []
+doCities = []
 dates = []
+dateTimes = []
+pays = []
 
+parent = None
 
 def start_gui():
     # Window
     window = tk.Tk()
     window.title("GET Request App")
     window.geometry("480x420")
+    parent = window
 
     # Title label
     title = tk.Label(window, text="Click to send GET request", font=("Arial", 12))
@@ -69,7 +74,6 @@ def start_gui():
     # Make columns expand nicely
     lists_frame.grid_columnconfigure(0, weight=1)
     lists_frame.grid_columnconfigure(1, weight=1)
-
     # Price section
     price_frame = tk.LabelFrame(window, text="Ride Price")
     price_frame.pack(fill="x", padx=10, pady=10)
@@ -102,6 +106,52 @@ def start_gui():
 
     window.mainloop()
 
+
+def open_trips_popup(parent, puCities, doCities, dateTime, pays):
+    """
+    Open a popup window titled 'Trips' and display each trip as text.
+    To: puCities[i], From: doCities[i], Date/Time: dateTime[i], Pay: pays[i]
+    """
+    n = min(len(puCities), len(doCities), len(dateTime), len(pays))
+    if n == 0:
+        messagebox.showinfo("Trips", "No trips to display.")
+        return
+
+    # Create popup window
+    win = tk.Toplevel(parent)
+    win.title("Trips")
+    win.geometry("420x360")
+
+    # Text widget to show trips
+    text_box = tk.Text(win, wrap="word", font=("Arial", 11))
+    text_box.pack(fill="both", expand=True, padx=10, pady=10)
+
+    # Populate trips
+    for i in range(n):
+        trip_text = (
+            f"Trip {i+1}:\n"
+            f"  To:   {puCities[i]}\n"
+            f"  From: {doCities[i]}\n"
+            f"  Date/Time: {dateTime[i]}\n"
+            f"  Pay: ${pays[i]:.2f}\n"
+            "--------------------------\n"
+        )
+        text_box.insert(tk.END, trip_text)
+
+    text_box.config(state="disabled")  # make it read-only
+
+    # Buttons frame
+    btn_frame = tk.Frame(win)
+    btn_frame.pack(pady=8)
+
+    # Reserve button (does nothing yet)
+    reserve_btn = tk.Button(btn_frame, text="Reserve Trips", bg="green", fg="white")
+    reserve_btn.grid(row=0, column=0, padx=6)
+
+    # Close button
+    close_btn = tk.Button(btn_frame, text="Close", command=win.destroy)
+    close_btn.grid(row=0, column=1, padx=6)
+
 def add_city(listbox: tk.Listbox, count_label: tk.Label):
     """Prompt for a city and add it to the list/array/UI."""
     city = simpledialog.askstring("Add City", "Enter city name:")
@@ -109,9 +159,9 @@ def add_city(listbox: tk.Listbox, count_label: tk.Label):
         city = city.strip()
         if not city:
             return
-        cities.append(city)
+        puCities.append(city)
         listbox.insert(tk.END, city)
-        count_label.config(text=f"{len(cities)} {'city' if len(cities)==1 else 'cities'}")
+        count_label.config(text=f"{len(puCities)} {'city' if len(puCities)==1 else 'cities'}")
 
 def add_date(listbox: tk.Listbox, count_label: tk.Label):
     """Prompt for a date, validate, then add. Accepts YYYY-MM-DD or MM/DD/YYYY."""
@@ -151,8 +201,10 @@ def handle_get_request():
         pay_amount = float(trip.get("payAmount", 0))
         print("PAY AMOUNT:", pay_amount)
 
-        #  check if either city matches one in cities[]
-        city_match = any(city in [pu_city, do_city] for city in cities)
+        #  check if either city matches one in puCities[]
+        # TODO: add dropoff checking 
+        city_match = any(city in [pu_city] for city in puCities)
+
 
         #  check if due_date contains any date substring in dates[]
         date_match = any(date_str in due_date for date_str in dates)
@@ -160,9 +212,15 @@ def handle_get_request():
         #  final combined check
         if city_match and date_match and pay_amount >= 20:
             results.append((trip["boltTripId"], due_date))
+            dateTimes.append(due_date)
+            doCities.append(do_city)
+            pays.append(pay_amount)
 
+        
         print("RESULTS:", results)
+    open_trips_popup(parent, puCities, doCities, dateTimes, pays)
     return results
+
 
 def poll_forever():
     while True:
