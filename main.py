@@ -115,7 +115,7 @@ def add_city(listbox: tk.Listbox, count_label: tk.Label):
 
 def add_date(listbox: tk.Listbox, count_label: tk.Label):
     """Prompt for a date, validate, then add. Accepts YYYY-MM-DD or MM/DD/YYYY."""
-    date_str = simpledialog.askstring("Add Date", "Enter date (YYYY-MM-DD or MM/DD/YYYY):")
+    date_str = simpledialog.askstring("Add Date", "Enter date MM/DD):")
     if not date_str:
         return
 
@@ -123,22 +123,11 @@ def add_date(listbox: tk.Listbox, count_label: tk.Label):
     if not date_str:
         return
 
-    parsed = None
-    for fmt in ("%Y-%m-%d", "%m/%d/%Y"):
-        try:
-            parsed = datetime.strptime(date_str, fmt)
-            break
-        except ValueError:
-            continue
 
-    if parsed is None:
-        messagebox.showerror("Invalid Date", "Please use YYYY-MM-DD or MM/DD/YYYY.")
-        return
 
     # Store normalized as YYYY-MM-DD for consistency
-    normalized = parsed.strftime("%Y-%m-%d")
-    dates.append(normalized)
-    listbox.insert(tk.END, normalized)
+    dates.append(date_str)
+    listbox.insert(tk.END, date_str)
     print("DATE: ", dates)
     count_label.config(text=f"{len(dates)} {'date' if len(dates)==1 else 'dates'}")
 
@@ -154,9 +143,13 @@ def handle_get_request():
     # print("DATA: ", data)
     for trip in data:  # assuming you have a list of trip dicts
         pu_city = trip.get("puCity", "").upper()
+        print("PU CITY:", pu_city)
         do_city = trip.get("doCity", "").upper()
-        due_date = trip.get("dueDate", "")
+        print("DO CITY:", do_city)
+        due_date = trip.get("dueTime", "")
+        print("DUE DATE:", due_date)
         pay_amount = float(trip.get("payAmount", 0))
+        print("PAY AMOUNT:", pay_amount)
 
         #  check if either city matches one in cities[]
         city_match = any(city in [pu_city, do_city] for city in cities)
